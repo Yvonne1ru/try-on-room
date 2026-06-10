@@ -1,0 +1,2233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+  <title>穿搭试衣间</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: rgba(255, 255, 255, 0.9);
+      --panel-strong: #ffffff;
+      --border: rgba(15, 23, 42, 0.1);
+      --text: #0f172a;
+      --subtext: #475569;
+      --muted: #94a3b8;
+      --primary: #4f46e5;
+      --primary-soft: rgba(79, 70, 229, 0.12);
+      --success: #16a34a;
+      --warning: #f59e0b;
+      --danger: #dc2626;
+      --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(99, 102, 241, 0.15), transparent 28%),
+        radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 24%),
+        var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 22px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+    }
+
+    .topbar-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .topbar-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--subtext);
+      font-size: 13px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .workspace {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(280px, 30%) minmax(360px, 40%) minmax(280px, 30%);
+      gap: 18px;
+    }
+
+    .panel {
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .panel-subtitle {
+      color: var(--subtext);
+      font-size: 12px;
+    }
+
+    .panel-body {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 0;
+    }
+
+    .upload-dropzone {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 220px;
+      padding: 22px;
+      border: 2px dashed rgba(79, 70, 229, 0.28);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, rgba(79, 70, 229, 0.04), rgba(79, 70, 229, 0.08));
+      text-align: center;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .upload-dropzone:hover,
+    .upload-dropzone.is-dragover {
+      border-color: rgba(79, 70, 229, 0.7);
+      background: linear-gradient(180deg, rgba(79, 70, 229, 0.08), rgba(79, 70, 229, 0.14));
+      transform: translateY(-1px);
+    }
+
+    .upload-dropzone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .upload-dropzone strong {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .upload-dropzone p {
+      margin: 0;
+      color: var(--subtext);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .upload-dropzone > div {
+      pointer-events: none;
+    }
+
+    .action-row,
+    .type-row,
+    .status-card,
+    .preview-meta,
+    .toolbar-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .segmented.type-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .segmented label {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .segmented input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .segmented span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 10px 12px;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.85);
+      color: var(--subtext);
+      font-size: 13px;
+      font-weight: 700;
+      transition: 0.18s ease;
+      text-align: center;
+    }
+
+    .segmented input:checked + span {
+      border-color: rgba(79, 70, 229, 0.32);
+      background: var(--primary-soft);
+      color: var(--primary);
+      box-shadow: inset 0 0 0 1px rgba(79, 70, 229, 0.12);
+    }
+
+    .hint-card,
+    .status-card,
+    .result-card {
+      padding: 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      background: rgba(255, 255, 255, 0.86);
+    }
+
+    .hint-card {
+      background: linear-gradient(180deg, rgba(14, 165, 233, 0.07), rgba(14, 165, 233, 0.02));
+    }
+
+    .hint-title,
+    .status-title,
+    .result-title {
+      margin: 0 0 6px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .hint-card p,
+    .status-card p,
+    .result-card p {
+      margin: 0;
+      color: var(--subtext);
+      line-height: 1.6;
+      font-size: 13px;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 14px;
+      min-height: 44px;
+      padding: 0 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: white;
+      box-shadow: 0 12px 24px rgba(79, 70, 229, 0.24);
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.06);
+      color: var(--text);
+    }
+
+    .btn-ghost {
+      background: white;
+      color: var(--subtext);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .preview-panel .panel-body {
+      align-items: center;
+      justify-content: center;
+    }
+
+    .canvas-stage {
+      position: relative;
+      width: min(100%, 420px);
+      aspect-ratio: 9 / 16;
+      border-radius: 28px;
+      overflow: hidden;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      background:
+        linear-gradient(180deg, rgba(79, 70, 229, 0.08), rgba(79, 70, 229, 0.02)),
+        linear-gradient(180deg, #ffffff, #f1f5f9);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+    }
+
+    #tryOnCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+
+    .preview-meta {
+      width: min(100%, 420px);
+    }
+
+    .slider-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .slider-item {
+      display: grid;
+      grid-template-columns: 56px 1fr 42px;
+      align-items: center;
+      gap: 10px;
+      color: var(--subtext);
+      font-size: 13px;
+    }
+
+    .slider-item input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+    }
+
+    .layer-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: 0.18s ease;
+      user-select: none;
+    }
+
+    .layer-badge.active {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-color: rgba(79, 70, 229, 0.3);
+    }
+
+    .layer-badge:not(.active) {
+      background: rgba(15, 23, 42, 0.05);
+      color: var(--muted);
+    }
+
+    .layer-switch-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .wardrobe-panel .panel-body {
+      min-height: 0;
+    }
+
+    .filter-tabs {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .filter-tabs button {
+      appearance: none;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 12px;
+      min-height: 40px;
+      background: rgba(255, 255, 255, 0.85);
+      color: var(--subtext);
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .filter-tabs button.active {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-color: rgba(79, 70, 229, 0.28);
+    }
+
+    .wardrobe-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .wardrobe-item {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 16px;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      background: rgba(255, 255, 255, 0.9);
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .wardrobe-item:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .wardrobe-item.active {
+      box-shadow: 0 0 0 3px #6366f1;
+      background: linear-gradient(180deg, rgba(79, 70, 229, 0.08), rgba(79, 70, 229, 0.02));
+    }
+
+    .wardrobe-delete {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.08);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: 0.18s ease;
+    }
+
+    .wardrobe-delete:hover {
+      background: rgba(220, 38, 38, 0.12);
+      color: var(--danger);
+    }
+
+    .wardrobe-thumb {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      border-radius: 12px;
+      background:
+        linear-gradient(180deg, rgba(226, 232, 240, 0.8), rgba(248, 250, 252, 0.95));
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+
+    .wardrobe-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--primary);
+      background: var(--primary-soft);
+      width: fit-content;
+    }
+
+    .meta-line {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .empty-state {
+      display: grid;
+      place-items: center;
+      min-height: 220px;
+      padding: 18px;
+      border: 1px dashed rgba(15, 23, 42, 0.08);
+      border-radius: 16px;
+      color: var(--muted);
+      text-align: center;
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1.1fr 1.6fr 1fr;
+      gap: 18px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+
+    .toolbar p {
+      margin: 0;
+      color: var(--subtext);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toast-stack {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 40;
+      display: grid;
+      gap: 10px;
+      width: min(92vw, 360px);
+    }
+
+    .toast {
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      background: rgba(255, 255, 255, 0.97);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.1);
+      transform: translateY(8px);
+      opacity: 0;
+      animation: toast-in 0.2s ease forwards;
+    }
+
+    .toast.success { border-left: 4px solid var(--success); }
+    .toast.warning { border-left: 4px solid var(--warning); }
+    .toast.error { border-left: 4px solid var(--danger); }
+
+    .toast strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .toast p {
+      margin: 0;
+      color: var(--subtext);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    @keyframes toast-in {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1180px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-tabs {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app-shell {
+        padding: 12px;
+        gap: 12px;
+      }
+
+      .topbar {
+        padding: 16px;
+      }
+
+      .topbar-title {
+        font-size: 20px;
+      }
+
+      .segmented {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .wardrobe-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .button-row {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <h1 class="topbar-title">穿搭试衣间</h1>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel upload-panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">上传区</h2>
+            <div class="panel-subtitle">支持拖拽、点击上传、手机拍照</div>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <div class="upload-dropzone" id="dropzone" role="button" tabindex="0" aria-label="上传衣物照片">
+            <input
+              id="fileInput"
+              type="file"
+              accept="image/*"
+            />
+            <div>
+              <strong>上传衣物照片</strong>
+              <p>点击上传 / 直接拖拽 / 手机可拍照</p>
+              <p>支持 PNG、JPG、WEBP，单张小于 20MB</p>
+            </div>
+          </div>
+
+          <div class="type-row">
+            <div class="panel-subtitle">衣物分类</div>
+            <div class="segmented type-grid" id="typeSelector">
+              <label><input type="radio" name="clothType" value="top" checked /><span>上衣</span></label>
+              <label><input type="radio" name="clothType" value="pants" /><span>裤子</span></label>
+              <label><input type="radio" name="clothType" value="skirt" /><span>半身裙</span></label>
+              <label><input type="radio" name="clothType" value="dress" /><span>连衣裙</span></label>
+              <label><input type="radio" name="clothType" value="shoes" /><span>鞋子</span></label>
+            </div>
+          </div>
+
+          <div class="status-card">
+            <h3 class="status-title">当前模式</h3>
+            <p id="statusText">当前为透明 PNG 上传 + 本地衣柜持久化模式，刷新后仍会保留。</p>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="panel preview-panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">试穿预览</h2>
+            <div class="panel-subtitle">9:16 画布，自定义模特图 + 衣物透明图叠加</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+            <button type="button" class="layer-badge active" id="modelFemale1" style="font-size:13px;">♀ 女 1</button>
+            <button type="button" class="layer-badge" id="modelFemale2" style="font-size:13px;">♀ 女 2</button>
+            <button type="button" class="layer-badge" id="modelFemale3" style="font-size:13px;">♀ 女 3</button>
+            <button type="button" class="layer-badge" id="modelMale1" style="font-size:13px;">♂ 男 1</button>
+            <button type="button" class="layer-badge" id="modelMale2" style="font-size:13px;">♂ 男 2</button>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <div class="canvas-stage">
+            <canvas id="tryOnCanvas" width="900" height="1600"></canvas>
+          </div>
+
+          <div class="preview-meta">
+            <div class="layer-switch-row" id="layerSwitchRow">
+              <span style="font-size:12px;color:var(--subtext);font-weight:600;">编辑图层：</span>
+              <button type="button" class="layer-badge active" data-layer="top" id="layerBtnTop">上衣 / 连衣裙</button>
+              <button type="button" class="layer-badge" data-layer="bottom" id="layerBtnBottom">下装 / 鞋子</button>
+              <button type="button" class="btn btn-ghost" id="confirmEditButton" style="min-height:32px;padding:0 12px;font-size:12px;">确认</button>
+            </div>
+            <div class="slider-grid">
+              <div class="slider-item">
+                <span>横移</span>
+                <input id="offsetX" type="range" min="-260" max="260" value="0" />
+                <strong id="offsetXValue">0</strong>
+              </div>
+              <div class="slider-item">
+                <span>纵移</span>
+                <input id="offsetY" type="range" min="-360" max="360" value="0" />
+                <strong id="offsetYValue">0</strong>
+              </div>
+              <div class="slider-item">
+                <span>缩放</span>
+                <input id="scale" type="range" min="0" max="250" step="0.5" value="100" />
+                <strong id="scaleValue">100%</strong>
+              </div>
+              <div class="slider-item">
+                <span>旋转</span>
+                <input id="rotation" type="range" min="-20" max="20" value="0" />
+                <strong id="rotationValue">0°</strong>
+              </div>
+              <div class="slider-item">
+                <span>透明度</span>
+                <input id="opacity" type="range" min="20" max="100" value="100" />
+                <strong id="opacityValue">100%</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel wardrobe-panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">衣柜</h2>
+            <div class="panel-subtitle">右侧缩略图预览，点击可高亮并切换中间预览</div>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <div class="filter-tabs" id="filterTabs">
+            <button type="button" class="active" data-filter="all">全部</button>
+            <button type="button" data-filter="top">上衣</button>
+            <button type="button" data-filter="pants">裤子</button>
+            <button type="button" data-filter="skirt">半身裙</button>
+            <button type="button" data-filter="dress">连衣裙</button>
+            <button type="button" data-filter="shoes">鞋子</button>
+          </div>
+
+          <div class="wardrobe-grid" id="wardrobeGrid">
+            <div class="empty-state" id="emptyState">还没有衣物，先上传一张试试。</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="toolbar">
+      <div class="toolbar-group">
+        <h3>当前状态</h3>
+        <p id="toolbarStatus">暂无选中衣物。</p>
+      </div>
+
+      <div class="toolbar-group">
+        <h3>工具栏</h3>
+        <div class="toolbar-actions">
+          <button class="btn btn-secondary" id="clearPreviewButton" type="button">清空预览</button>
+          <button class="btn btn-ghost" id="clearWardrobeButton" type="button">清空暂存衣柜</button>
+          <button class="btn btn-primary" id="exportButton" type="button">导出搭配图</button>
+        </div>
+      </div>
+
+      <div class="toolbar-group">
+        <h3>存储</h3>
+        <p>当前衣柜优先保存到浏览器 IndexedDB，刷新页面后不会丢失。</p>
+      </div>
+    </footer>
+  </div>
+
+  <div class="toast-stack" id="toastStack"></div>
+
+  <script>
+    /* ─── WardrobeDB ─────────────────────────────────────────── */
+    window.WardrobeDB = (() => {
+      const DB_NAME = 'WardrobeDB';
+      const STORE = 'clothes';
+      const VERSION = 1;
+      let _db = null;
+
+      function open() {
+        return new Promise((resolve, reject) => {
+          if (_db) { resolve(_db); return; }
+          const req = indexedDB.open(DB_NAME, VERSION);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE)) {
+              db.createObjectStore(STORE, { keyPath: 'id' });
+            }
+          };
+          req.onsuccess = (e) => { _db = e.target.result; resolve(_db); };
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+      function tx(mode) {
+        return _db.transaction(STORE, mode).objectStore(STORE);
+      }
+
+      function wrap(req) {
+        return new Promise((resolve, reject) => {
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+      return {
+        async init() { await open(); },
+        async add(cloth) { await open(); return wrap(tx('readwrite').put(cloth)); },
+        async getAll() {
+          await open();
+          const items = await wrap(tx('readonly').getAll());
+          return items.sort((a, b) => b.createdAt - a.createdAt);
+        },
+        async delete(id) { await open(); return wrap(tx('readwrite').delete(id)); },
+        async deleteOldest() {
+          await open();
+          const all = await wrap(tx('readonly').getAll());
+          if (!all.length) return;
+          const oldest = all.reduce((a, b) => a.createdAt < b.createdAt ? a : b);
+          return wrap(tx('readwrite').delete(oldest.id));
+        },
+      };
+    })();
+
+    /* ─── TryonEngine ────────────────────────────────────────── */
+    window.TryonEngine = (() => {
+      /* logical canvas size — CSS scales it to fit container */
+      const CW = 540, CH = 960;
+      let _canvas = null, _ctx = null;
+      let _rafId = null, _dirty = false;
+      let _dpr = 1;
+
+      /* image cache: id → HTMLImageElement */
+      const _imgCache = new Map();
+
+      /* layer state */
+      window.layers = {
+        top:    null,  /* { id, img, x, y, scale, rotation, opacity } */
+        bottom: null,
+      };
+
+      /* which layer is active for slider / drag interactions */
+      let _activeLayerKey = 'top';
+
+      /* drag state */
+      const _drag = { active: false, layerKey: null, startX: 0, startY: 0, origX: 0, origY: 0 };
+      let _isEditMode = false;
+
+      const MIN_SCALE = 0;
+      const MAX_SCALE = 2.5;
+      const WHEEL_ZOOM_SENSITIVITY = 0.0006;
+
+      /* ── safe-area presets (logical px) ─────────────────────── */
+      const SAFE_AREAS = {
+        top:    { x: CW/2, y: 310, w: 240, h: 230 },
+        pants:  { x: CW/2, y: 570, w: 210, h: 290 },
+        skirt:  { x: CW/2, y: 530, w: 230, h: 260 },
+        dress:  { x: CW/2, y: 470, w: 250, h: 430 },
+        shoes:  { x: CW/2, y: 820, w: 180, h: 110 },
+      };
+
+      function typeToLayerKey(type) {
+        return ['top','dress'].includes(type) ? 'top' : 'bottom';
+      }
+
+      /* ── image loader with cache ─────────────────────────────── */
+      function loadImage(id, dataURL) {
+        if (_imgCache.has(id)) return Promise.resolve(_imgCache.get(id));
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => { _imgCache.set(id, img); resolve(img); };
+          img.onerror = () => reject(new Error('img load failed'));
+          img.src = dataURL;
+        });
+      }
+
+      /* ── rAF-throttled render scheduler ─────────────────────── */
+      function scheduleRender() {
+        if (_dirty) return;
+        _dirty = true;
+        _rafId = requestAnimationFrame(() => {
+          _dirty = false;
+          _render();
+        });
+      }
+
+      const CUSTOM_MODEL_SRC = {
+        female1: './assets/models/009.png',
+        female2: './assets/models/2.png',
+        female3: './assets/models/3.png',
+        male1: './assets/models/1.png',
+        male2: './assets/models/4.png',
+      };
+      const _customModelImg = {
+        female1: null,
+        female2: null,
+        female3: null,
+        male1: null,
+        male2: null,
+      };
+      const _customModelLoading = {
+        female1: null,
+        female2: null,
+        female3: null,
+        male1: null,
+        male2: null,
+      };
+
+      /* current mannequin preset */
+      let _modelPreset = 'female1';
+
+      function _getModelGenderByPreset(preset = _modelPreset) {
+        return preset === 'male1' || preset === 'male2' ? 'male' : 'female';
+      }
+
+      function _loadCustomModel(preset = _modelPreset) {
+        if (_customModelImg[preset]) return Promise.resolve(_customModelImg[preset]);
+        if (_customModelLoading[preset]) return _customModelLoading[preset];
+        _customModelLoading[preset] = new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => {
+            _customModelImg[preset] = img;
+            resolve(img);
+          };
+          img.onerror = () => {
+            _customModelLoading[preset] = null;
+            reject(new Error('custom model load failed'));
+          };
+          img.src = CUSTOM_MODEL_SRC[preset];
+        });
+        return _customModelLoading[preset];
+      }
+
+      /* ── mannequin SVG paths (logical 540×960 canvas) ────────
+         All paths drawn in a coordinate system centered at (270, 480).
+         Female: slender hourglass fashion figure
+         Male:   broad-shoulder athletic figure
+      ──────────────────────────────────────────────────────── */
+
+      const DEFAULT_MODEL_FOREGROUND_RATIO = 0.24;
+      const MODEL_SCALE_BY_PRESET = {
+        female2: 1.125,
+        female3: 1.125,
+        male1: 1.125,
+        male2: 1.125,
+      };
+
+      function _getModelForegroundRatio() {
+        return DEFAULT_MODEL_FOREGROUND_RATIO;
+      }
+
+      function _getModelScaleMultiplier(preset = _modelPreset) {
+        return MODEL_SCALE_BY_PRESET[preset] ?? 1;
+      }
+
+      function _getCustomModelRect(img, preset = _modelPreset) {
+        const maxWidth = CW * 0.72;
+        const maxHeight = CH * 0.92;
+        const baseScale = Math.min(maxWidth / img.naturalWidth, maxHeight / img.naturalHeight);
+        const scale = baseScale * _getModelScaleMultiplier(preset);
+        const drawWidth = img.naturalWidth * scale;
+        const drawHeight = img.naturalHeight * scale;
+        const x = (CW - drawWidth) / 2;
+        const y = CH - drawHeight;
+        return { x, y, drawWidth, drawHeight };
+      }
+
+      function _drawCustomModel(ctx, img, preset = _modelPreset) {
+        const { x, y, drawWidth, drawHeight } = _getCustomModelRect(img, preset);
+        ctx.drawImage(img, x, y, drawWidth, drawHeight);
+      }
+
+      function _drawCustomModelForeground(ctx, img, preset = _modelPreset) {
+        const { x, y, drawWidth, drawHeight } = _getCustomModelRect(img, preset);
+        const foregroundHeight = drawHeight * _getModelForegroundRatio(preset);
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(x, y, drawWidth, foregroundHeight);
+        ctx.clip();
+        ctx.drawImage(img, x, y, drawWidth, drawHeight);
+        ctx.restore();
+      }
+
+      function _drawBackground(ctx) {
+        const bg = ctx.createLinearGradient(0, 0, 0, CH);
+        bg.addColorStop(0, '#f8f9ff');
+        bg.addColorStop(1, '#eef2ff');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, CW, CH);
+      }
+
+      function _drawMannequin(ctx) {
+        if (_customModelImg[_modelPreset]) {
+          _drawCustomModel(ctx, _customModelImg[_modelPreset], _modelPreset);
+        }
+      }
+
+      function _drawMannequinForeground(ctx) {
+        if (_customModelImg[_modelPreset]) {
+          _drawCustomModelForeground(ctx, _customModelImg[_modelPreset]);
+        }
+      }
+
+      /* ── skin / stroke palette ───────────────────────────────── */
+      const SKIN   = '#f5cba7';
+      const SKIN2  = '#e8b48a';   /* shadow / limbs */
+      const STROKE = 'rgba(160,120,80,0.35)';
+      const HAIR_F = '#3b2314';
+      const HAIR_M = '#2c1a0e';
+      const SUIT   = 'rgba(200,210,230,0.18)';   /* clothes guide tint */
+      const REF    = 'rgba(99,102,241,0.15)';     /* reference lines */
+
+      function _applyFill(ctx, color, strokeColor) {
+        ctx.fillStyle = color;
+        ctx.fill();
+        if (strokeColor) {
+          ctx.strokeStyle = strokeColor;
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+        }
+      }
+
+      /* ════════════════════════════════════════════════
+         FEMALE FIGURE  (centered, ~540×960 logical)
+         Height span: head top ≈ -450, feet bottom ≈ +450
+      ════════════════════════════════════════════════ */
+      function _drawFemale(ctx) {
+
+        /* ── shadow ellipse ── */
+        ctx.save();
+        ctx.fillStyle = 'rgba(0,0,0,0.06)';
+        ctx.beginPath();
+        ctx.ellipse(0, 445, 85, 14, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        /* ── legs (drawn first, behind torso) ── */
+        ctx.save();
+        /* left leg */
+        ctx.beginPath();
+        ctx.moveTo(-18, 160);
+        ctx.bezierCurveTo(-18, 200, -30, 280, -34, 360);
+        ctx.bezierCurveTo(-36, 400, -32, 420, -28, 445);
+        ctx.lineTo(-10, 445);
+        ctx.bezierCurveTo(-12, 420, -14, 400, -12, 360);
+        ctx.bezierCurveTo(-8, 280,  -2, 200,  0, 160);
+        ctx.closePath();
+        _applyFill(ctx, SKIN2, STROKE);
+
+        /* right leg */
+        ctx.beginPath();
+        ctx.moveTo(18, 160);
+        ctx.bezierCurveTo(18, 200, 30, 280, 34, 360);
+        ctx.bezierCurveTo(36, 400, 32, 420, 28, 445);
+        ctx.lineTo(10, 445);
+        ctx.bezierCurveTo(12, 420, 14, 400, 12, 360);
+        ctx.bezierCurveTo(8, 280, 2, 200, 0, 160);
+        ctx.closePath();
+        _applyFill(ctx, SKIN2, STROKE);
+        ctx.restore();
+
+        /* ── arms ── */
+        ctx.save();
+        /* left arm */
+        ctx.beginPath();
+        ctx.moveTo(-62, -140);
+        ctx.bezierCurveTo(-80, -100, -90, 0, -86, 80);
+        ctx.bezierCurveTo(-84, 110, -78, 130, -74, 150);
+        ctx.lineTo(-60, 148);
+        ctx.bezierCurveTo(-64, 128, -68, 108, -70, 80);
+        ctx.bezierCurveTo(-74, 0, -64, -96, -46, -136);
+        ctx.closePath();
+        _applyFill(ctx, SKIN, STROKE);
+
+        /* right arm */
+        ctx.beginPath();
+        ctx.moveTo(62, -140);
+        ctx.bezierCurveTo(80, -100, 90, 0, 86, 80);
+        ctx.bezierCurveTo(84, 110, 78, 130, 74, 150);
+        ctx.lineTo(60, 148);
+        ctx.bezierCurveTo(64, 128, 68, 108, 70, 80);
+        ctx.bezierCurveTo(74, 0, 64, -96, 46, -136);
+        ctx.closePath();
+        _applyFill(ctx, SKIN, STROKE);
+        ctx.restore();
+
+        /* ── torso (hourglass) ── */
+        ctx.save();
+        ctx.beginPath();
+        /* top: shoulders */
+        ctx.moveTo(-70, -150);
+        ctx.bezierCurveTo(-72, -130, -68, -90, -58, -60);
+        /* waist in */
+        ctx.bezierCurveTo(-48, -28, -38, -10, -36, 10);
+        /* hips out */
+        ctx.bezierCurveTo(-34, 30, -44, 80, -48, 120);
+        ctx.bezierCurveTo(-50, 140, -42, 158, -22, 162);
+        ctx.lineTo(22, 162);
+        ctx.bezierCurveTo(42, 158, 50, 140, 48, 120);
+        ctx.bezierCurveTo(44, 80, 34, 30, 36, 10);
+        ctx.bezierCurveTo(38, -10, 48, -28, 58, -60);
+        ctx.bezierCurveTo(68, -90, 72, -130, 70, -150);
+        /* shoulder curve */
+        ctx.bezierCurveTo(58, -162, 30, -168, 0, -168);
+        ctx.bezierCurveTo(-30, -168, -58, -162, -70, -150);
+        ctx.closePath();
+        _applyFill(ctx, SKIN, STROKE);
+        ctx.restore();
+
+        /* ── chest detail (subtle) ── */
+        ctx.save();
+        ctx.fillStyle = 'rgba(160,100,60,0.08)';
+        ctx.beginPath();
+        ctx.ellipse(-18, -90, 20, 14, -0.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(18, -90, 20, 14, 0.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        /* ── neck ── */
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(-16, -168);
+        ctx.bezierCurveTo(-18, -190, -16, -210, -14, -224);
+        ctx.lineTo(14, -224);
+        ctx.bezierCurveTo(16, -210, 18, -190, 16, -168);
+        ctx.closePath();
+        _applyFill(ctx, SKIN, STROKE);
+        ctx.restore();
+
+        /* ── head ── */
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(0, -268, 42, 52, 0, 0, Math.PI * 2);
+        _applyFill(ctx, SKIN, STROKE);
+        ctx.restore();
+
+        /* ── hair (long) ── */
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(-42, -290);
+        ctx.bezierCurveTo(-55, -270, -58, -240, -56, -210);
+        ctx.bezierCurveTo(-54, -180, -50, -160, -48, -150);
+        ctx.bezierCurveTo(-52, -168, -48, -200, -42, -230);
+        ctx.bezierCurveTo(-36, -260, -20, -320, 0, -320);
+        ctx.bezierCurveTo(20, -320, 36, -260, 42, -230);
+        ctx.bezierCurveTo(48, -200, 52, -168, 48, -150);
+        ctx.bezierCurveTo(50, -160, 54, -180, 56, -210);
+        ctx.bezierCurveTo(58, -240, 55, -270, 42, -290);
+        ctx.bezierCurveTo(30, -328, -30, -328, -42, -290);
+        ctx.closePath();
+        _applyFill(ctx, HAIR_F, null);
+        ctx.restore();
+
+        /* ── facial features (minimal dot eyes + mouth) ── */
+        ctx.save();
+        ctx.fillStyle = 'rgba(60,30,10,0.7)';
+        ctx.beginPath(); ctx.ellipse(-14, -270, 3, 3.5, 0, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(14, -270, 3, 3.5, 0, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = 'rgba(160,80,60,0.55)';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.arc(0, -256, 10, 0.1, Math.PI - 0.1);
+        ctx.stroke();
+        ctx.restore();
+
+        /* ── hands ── */
+        ctx.save();
+        ctx.fillStyle = SKIN;
+        ctx.strokeStyle = STROKE;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.ellipse(-67, 153, 10, 13, 0.1, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(67, 153, 10, 13, -0.1, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.restore();
+
+        /* ── feet / heels ── */
+        ctx.save();
+        ctx.fillStyle = SKIN2;
+        ctx.strokeStyle = STROKE;
+        ctx.lineWidth = 1;
+        /* left foot */
+        ctx.beginPath();
+        ctx.moveTo(-28, 438);
+        ctx.bezierCurveTo(-32, 438, -38, 442, -38, 448);
+        ctx.lineTo(-8, 448);
+        ctx.lineTo(-8, 438);
+        ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        /* right foot */
+        ctx.beginPath();
+        ctx.moveTo(28, 438);
+        ctx.bezierCurveTo(32, 438, 38, 442, 38, 448);
+        ctx.lineTo(8, 448);
+        ctx.lineTo(8, 438);
+        ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        ctx.restore();
+
+        /* ── reference guide lines ── */
+        ctx.save();
+        ctx.strokeStyle = REF;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([6, 6]);
+        /* shoulder */
+        ctx.beginPath(); ctx.moveTo(-75, -150); ctx.lineTo(75, -150); ctx.stroke();
+        /* bust */
+        ctx.beginPath(); ctx.moveTo(-62, -90); ctx.lineTo(62, -90); ctx.stroke();
+        /* waist */
+        ctx.beginPath(); ctx.moveTo(-40, 10); ctx.lineTo(40, 10); ctx.stroke();
+        /* hip */
+        ctx.beginPath(); ctx.moveTo(-52, 110); ctx.lineTo(52, 110); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+      }
+
+      /* ════════════════════════════════════════════════
+         MALE FIGURE
+         Broad shoulders, flat chest, narrower hips
+      ════════════════════════════════════════════════ */
+      function _drawMale(ctx) {
+
+        /* ── shadow ── */
+        ctx.save();
+        ctx.fillStyle = 'rgba(0,0,0,0.07)';
+        ctx.beginPath();
+        ctx.ellipse(0, 445, 95, 14, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        /* ── legs ── */
+        ctx.save();
+        /* left leg */
+        ctx.beginPath();
+        ctx.moveTo(-26, 140);
+        ctx.bezierCurveTo(-28, 200, -36, 290, -38, 370);
+        ctx.bezierCurveTo(-39, 405, -36, 425, -32, 445);
+        ctx.lineTo(-12, 445);
+        ctx.bezierCurveTo(-14, 425, -16, 405, -16, 370);
+        ctx.bezierCurveTo(-14, 290, -6, 200, -2, 140);
+        ctx.closePath();
+        _applyFill(ctx, SKIN2, STROKE);
+
+        /* right leg */
+        ctx.beginPath();
+        ctx.moveTo(26, 140);
+        ctx.bezierCurveTo(28, 200, 36, 290, 38, 370);
+        ctx.bezierCurveTo(39, 405, 36, 425, 32, 445);
+        ctx.lineTo(12, 445);
+        ctx.bezierCurveTo(14, 425, 16, 405, 16, 370);
+        ctx.bezierCurveTo(14, 290, 6, 200, 2, 140);
+        ctx.closePath();
+        _applyFill(ctx, SKIN2, STROKE);
+        ctx.restore();
+
+        /* ── arms ── */
+        ctx.save();
+        /* left arm */
+        ctx.beginPath();
+        ctx.moveTo(-86, -130);
+        ctx.bezierCurveTo(-104, -80, -110, 20, -104, 110);
+        ctx.bezierCurveTo(-102, 130, -96, 148, -90, 162);
+        ctx.lineTo(-74, 158);
+        ctx.bezierCurveTo(-80, 144, -84, 126, -86, 108);
+        ctx.bezierCurveTo(-90, 18, -84, -76, -66, -124);
+        ctx.closePath();
+        _applyFill(ctx, SKIN, STROKE);
+
+        /* right arm */
+        ctx.beginPath();
+        ctx.moveTo(86, -130);
+        ctx.bezierCurveTo(104, -80, 110, 20, 104, 110);
+        ctx.bezierCurveTo(102, 130, 96, 148, 90, 162);
+        ctx.lineTo(74, 158);
+        ctx.bezierCurveTo(80, 144, 84, 126, 86, 108);
+        ctx.bezierCurveTo(90, 18, 84, -76, 66, -124);
+        ctx.closePath();
+        _applyFill(ctx, SKIN, STROKE);
+        ctx.restore();
+
+        /* ── torso (inverted triangle, flat chest) ── */
+        ctx.save();
+        ctx.beginPath();
+        /* shoulders wide */
+        ctx.moveTo(-90, -148);
+        ctx.bezierCurveTo(-90, -120, -82, -80, -68, -40);
+        /* taper to waist */
+        ctx.bezierCurveTo(-54, 0, -46, 40, -46, 80);
+        /* hips (narrower than female) */
+        ctx.bezierCurveTo(-46, 110, -42, 135, -30, 144);
+        ctx.lineTo(30, 144);
+        ctx.bezierCurveTo(42, 135, 46, 110, 46, 80);
+        ctx.bezierCurveTo(46, 40, 54, 0, 68, -40);
+        ctx.bezierCurveTo(82, -80, 90, -120, 90, -148);
+        /* shoulder top */
+        ctx.bezierCurveTo(76, -164, 40, -172, 0, -172);
+        ctx.bezierCurveTo(-40, -172, -76, -164, -90, -148);
+        ctx.closePath();
+        _applyFill(ctx, SKIN, STROKE);
+        ctx.restore();
+
+        /* ── pectoral detail ── */
+        ctx.save();
+        ctx.strokeStyle = 'rgba(140,90,50,0.15)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(-22, -80, 22, 0.3, Math.PI - 0.3);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(22, -80, 22, 0.3, Math.PI - 0.3);
+        ctx.stroke();
+        ctx.restore();
+
+        /* ── abs hint ── */
+        ctx.save();
+        ctx.strokeStyle = 'rgba(140,90,50,0.1)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(-24, -20 + i*28); ctx.lineTo(24, -20 + i*28);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        /* ── neck ── */
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(-18, -172);
+        ctx.bezierCurveTo(-20, -192, -18, -212, -16, -226);
+        ctx.lineTo(16, -226);
+        ctx.bezierCurveTo(18, -212, 20, -192, 18, -172);
+        ctx.closePath();
+        _applyFill(ctx, SKIN, STROKE);
+        ctx.restore();
+
+        /* ── head ── */
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(0, -272, 44, 50, 0, 0, Math.PI * 2);
+        _applyFill(ctx, SKIN, STROKE);
+        ctx.restore();
+
+        /* ── hair (short) ── */
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(0, -298, 44, 28, 0, 0, Math.PI * 2);
+        ctx.fillStyle = HAIR_M;
+        ctx.fill();
+        /* hairline edge */
+        ctx.beginPath();
+        ctx.moveTo(-44, -282);
+        ctx.bezierCurveTo(-38, -316, -20, -328, 0, -328);
+        ctx.bezierCurveTo(20, -328, 38, -316, 44, -282);
+        ctx.fillStyle = HAIR_M;
+        ctx.fill();
+        ctx.restore();
+
+        /* ── facial features ── */
+        ctx.save();
+        ctx.fillStyle = 'rgba(50,25,5,0.75)';
+        ctx.beginPath(); ctx.ellipse(-15, -274, 3.5, 3.5, 0, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(15, -274, 3.5, 3.5, 0, 0, Math.PI*2); ctx.fill();
+        /* brow */
+        ctx.strokeStyle = HAIR_M;
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(-22, -286); ctx.lineTo(-8, -282); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(22, -286); ctx.lineTo(8, -282); ctx.stroke();
+        /* mouth */
+        ctx.strokeStyle = 'rgba(150,70,50,0.5)';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(-10, -256); ctx.lineTo(10, -256);
+        ctx.stroke();
+        ctx.restore();
+
+        /* ── hands ── */
+        ctx.save();
+        ctx.fillStyle = SKIN;
+        ctx.strokeStyle = STROKE;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.ellipse(-82, 165, 12, 14, 0.1, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(82, 165, 12, 14, -0.1, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.restore();
+
+        /* ── feet ── */
+        ctx.save();
+        ctx.fillStyle = SKIN2;
+        ctx.strokeStyle = STROKE;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(-32, 438); ctx.bezierCurveTo(-36, 438, -44, 442, -44, 448);
+        ctx.lineTo(-10, 448); ctx.lineTo(-10, 438); ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(32, 438); ctx.bezierCurveTo(36, 438, 44, 442, 44, 448);
+        ctx.lineTo(10, 448); ctx.lineTo(10, 438); ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        ctx.restore();
+
+        /* ── reference guide lines ── */
+        ctx.save();
+        ctx.strokeStyle = REF;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([6, 6]);
+        ctx.beginPath(); ctx.moveTo(-95, -148); ctx.lineTo(95, -148); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-72, -40); ctx.lineTo(72, -40); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-50, 70); ctx.lineTo(50, 70); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+      }
+
+      /* ── draw one cloth layer ────────────────────────────────── */
+      function _drawLayer(ctx, layerKey, layer) {
+        if (!layer || !layer.img) return;
+        const isActive = layerKey === _activeLayerKey;
+        const isEditingLayer = _isEditMode && isActive;
+
+        ctx.save();
+        ctx.globalAlpha = _isEditMode && !isActive ? layer.opacity * 0.55 : layer.opacity;
+
+        const cx = layer.x + CW / 2;
+        const cy = layer.y + CH / 2;
+
+        ctx.translate(cx, cy);
+        ctx.rotate(layer.rotation * Math.PI / 180);
+        ctx.scale(layer.scale, layer.scale);
+
+        const img = layer.img;
+        const hw = img.naturalWidth / 2;
+        const hh = img.naturalHeight / 2;
+        try {
+          ctx.drawImage(img, -hw, -hh);
+        } catch (_e) {
+          /* broken image fallback */
+          ctx.fillStyle = 'rgba(148,163,184,0.35)';
+          ctx.fillRect(-60, -60, 120, 120);
+          ctx.restore();
+          ctx.save();
+          ctx.fillStyle = 'rgba(100,116,139,0.7)';
+          ctx.font = '14px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('素材异常', cx, cy + 4);
+          ctx.restore();
+          return;
+        }
+
+        ctx.restore();
+
+        /* active layer highlight border */
+        if (isEditingLayer) {
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(layer.rotation * Math.PI / 180);
+          ctx.scale(layer.scale, layer.scale);
+          const hw2 = img.naturalWidth / 2;
+          const hh2 = img.naturalHeight / 2;
+          ctx.strokeStyle = '#6366f1';
+          ctx.lineWidth = 3 / layer.scale;
+          ctx.setLineDash([8 / layer.scale, 5 / layer.scale]);
+          ctx.strokeRect(-hw2 - 4, -hh2 - 4, img.naturalWidth + 8, img.naturalHeight + 8);
+          ctx.setLineDash([]);
+          ctx.restore();
+        }
+      }
+
+      /* ── main render ─────────────────────────────────────────── */
+      function _render() {
+        if (!_canvas || !_ctx) return;
+        const ctx = _ctx;
+        ctx.clearRect(0, 0, CW, CH);
+        _drawBackground(ctx);
+        _drawMannequin(ctx);
+        _drawLayer(ctx, 'bottom', window.layers.bottom);
+        _drawLayer(ctx, 'top', window.layers.top);
+        _drawMannequinForeground(ctx);
+      }
+
+      /* ── auto-fit: compute scale & centered position ─────────── */
+      function _autoFit(img, type) {
+        const sa = SAFE_AREAS[type] || SAFE_AREAS.top;
+        const scale = Math.min(sa.w / img.naturalWidth, sa.h / img.naturalHeight);
+        return {
+          x: sa.x - CW / 2,  /* relative to canvas center */
+          y: sa.y - CH / 2,
+          scale: Math.min(scale, MAX_SCALE),
+          rotation: 0,
+          opacity: 1,
+        };
+      }
+
+      /* ── logical-px hit test (canvas coords) ─────────────────── */
+      function _hitLayer(logX, logY, layer) {
+        if (!layer || !layer.img) return false;
+        const cx = layer.x + CW / 2;
+        const cy = layer.y + CH / 2;
+        const dx = logX - cx;
+        const dy = logY - cy;
+        const rad = -layer.rotation * Math.PI / 180;
+        const rx = dx * Math.cos(rad) - dy * Math.sin(rad);
+        const ry = dx * Math.sin(rad) + dy * Math.cos(rad);
+        const hw = (layer.img.naturalWidth / 2) * layer.scale;
+        const hh = (layer.img.naturalHeight / 2) * layer.scale;
+        return Math.abs(rx) <= hw && Math.abs(ry) <= hh;
+      }
+
+      /* ── client coords → logical canvas coords ───────────────── */
+      function _toLogical(clientX, clientY) {
+        const rect = _canvas.getBoundingClientRect();
+        return {
+          x: (clientX - rect.left) * (CW / rect.width),
+          y: (clientY - rect.top) * (CH / rect.height),
+        };
+      }
+
+      /* ── drag events ─────────────────────────────────────────── */
+      function _onPointerDown(e) {
+        const pt = e.touches ? e.touches[0] : e;
+        const { x, y } = _toLogical(pt.clientX, pt.clientY);
+        /* priority: active layer first, then other */
+        const order = _activeLayerKey === 'top' ? ['top','bottom'] : ['bottom','top'];
+        for (const key of order) {
+          const layer = window.layers[key];
+          if (layer && _hitLayer(x, y, layer)) {
+            _drag.active = true;
+            _drag.layerKey = key;
+            _drag.startX = x;
+            _drag.startY = y;
+            _drag.origX = layer.x;
+            _drag.origY = layer.y;
+            _activeLayerKey = key;
+            _isEditMode = true;
+            _syncLayerBadges();
+            _syncSlidersFromLayer(key);
+            scheduleRender();
+            e.preventDefault();
+            return;
+          }
+        }
+      }
+
+      function _onPointerMove(e) {
+        if (!_drag.active) return;
+        const pt = e.touches ? e.touches[0] : e;
+        const { x, y } = _toLogical(pt.clientX, pt.clientY);
+        const layer = window.layers[_drag.layerKey];
+        if (!layer) return;
+        layer.x = _drag.origX + (x - _drag.startX);
+        layer.y = _drag.origY + (y - _drag.startY);
+        _syncSlidersFromLayer(_drag.layerKey);
+        scheduleRender();
+        e.preventDefault();
+      }
+
+      function _onPointerUp() {
+        _drag.active = false;
+      }
+
+      /* ── wheel zoom ──────────────────────────────────────────── */
+      function _onWheel(e) {
+        e.preventDefault();
+        const layer = window.layers[_activeLayerKey];
+        if (!layer) return;
+        const nextScale = layer.scale <= 0 && e.deltaY < 0
+          ? 0.02
+          : layer.scale * Math.exp(-e.deltaY * WHEEL_ZOOM_SENSITIVITY);
+        layer.scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, nextScale));
+        _syncSlidersFromLayer(_activeLayerKey);
+        scheduleRender();
+      }
+
+      /* ── sync sliders → canvas ───────────────────────────────── */
+      function _syncSlidersFromLayer(key) {
+        const layer = window.layers[key];
+        if (!layer) return;
+        const el = {
+          offsetX: document.getElementById('offsetX'),
+          offsetY: document.getElementById('offsetY'),
+          scale: document.getElementById('scale'),
+          rotation: document.getElementById('rotation'),
+          opacity: document.getElementById('opacity'),
+        };
+        if (el.offsetX) el.offsetX.value = Math.round(layer.x);
+        if (el.offsetY) el.offsetY.value = Math.round(layer.y);
+        if (el.scale) el.scale.value = (layer.scale * 100).toFixed(1);
+        if (el.rotation) el.rotation.value = Math.round(layer.rotation);
+        if (el.opacity) el.opacity.value = Math.round(layer.opacity * 100);
+        _updateSliderLabels();
+      }
+
+      function _updateSliderLabels() {
+        const get = id => document.getElementById(id);
+        const offsetX = Number(get('offsetX')?.value || 0);
+        const offsetY = Number(get('offsetY')?.value || 0);
+        const scaleV = Number(get('scale')?.value || 100);
+        const rotationV = Number(get('rotation')?.value || 0);
+        const opacityV = Number(get('opacity')?.value || 100);
+        const set = (id, txt) => { const el = get(id); if (el) el.textContent = txt; };
+        set('offsetXValue', String(offsetX));
+        set('offsetYValue', String(offsetY));
+        set('scaleValue', `${Number.isInteger(scaleV) ? scaleV : scaleV.toFixed(1)}%`);
+        set('rotationValue', `${rotationV}°`);
+        set('opacityValue', `${opacityV}%`);
+      }
+
+      function _syncLayerBadges() {
+        const btnTop = document.getElementById('layerBtnTop');
+        const btnBot = document.getElementById('layerBtnBottom');
+        if (btnTop) btnTop.classList.toggle('active', _activeLayerKey === 'top');
+        if (btnBot) btnBot.classList.toggle('active', _activeLayerKey === 'bottom');
+      }
+
+      /* ─────────────────────────────────────────────────────────
+         Public API
+      ───────────────────────────────────────────────────────── */
+      return {
+        init(canvasEl) {
+          _canvas = canvasEl;
+          _dpr = window.devicePixelRatio || 1;
+
+          /* physical size = logical * dpr */
+          _canvas.width  = CW * _dpr;
+          _canvas.height = CH * _dpr;
+
+          _ctx = _canvas.getContext('2d');
+          _ctx.scale(_dpr, _dpr);   /* draw in logical px from now on */
+
+          /* pointer drag */
+          _canvas.addEventListener('mousedown',  _onPointerDown, { passive: false });
+          _canvas.addEventListener('touchstart', _onPointerDown, { passive: false });
+          window.addEventListener('mousemove',  _onPointerMove, { passive: false });
+          window.addEventListener('touchmove',  _onPointerMove, { passive: false });
+          window.addEventListener('mouseup',   _onPointerUp);
+          window.addEventListener('touchend',  _onPointerUp);
+
+          /* wheel zoom */
+          _canvas.addEventListener('wheel', _onWheel, { passive: false });
+
+          _loadCustomModel().then(scheduleRender).catch(() => {});
+          scheduleRender();
+        },
+
+        render() { scheduleRender(); },
+
+        async setLayer(layerKey, cloth) {
+          if (!cloth) {
+            window.layers[layerKey] = null;
+            scheduleRender();
+            return;
+          }
+          try {
+            const img = await loadImage(cloth.id, cloth.dataURL);
+            const fit = _autoFit(img, cloth.type);
+            window.layers[layerKey] = { id: cloth.id, img, ...fit };
+            _activeLayerKey = layerKey;
+            _isEditMode = true;
+            _syncLayerBadges();
+            _syncSlidersFromLayer(layerKey);
+            scheduleRender();
+          } catch (_e) {
+            window.layers[layerKey] = null;
+            scheduleRender();
+          }
+        },
+
+        setActiveLayer(key) {
+          if (!['top','bottom'].includes(key)) return;
+          _activeLayerKey = key;
+          _isEditMode = true;
+          _syncLayerBadges();
+          _syncSlidersFromLayer(key);
+          scheduleRender();
+        },
+
+        confirmAdjustments() {
+          _isEditMode = false;
+          scheduleRender();
+        },
+
+        isEditMode() { return _isEditMode; },
+
+        getActiveLayerKey() { return _activeLayerKey; },
+
+        setModelPreset(preset) {
+          _modelPreset = preset;
+          const btnF1 = document.getElementById('modelFemale1');
+          const btnF2 = document.getElementById('modelFemale2');
+          const btnF3 = document.getElementById('modelFemale3');
+          const btnM1 = document.getElementById('modelMale1');
+          const btnM2 = document.getElementById('modelMale2');
+          if (btnF1) btnF1.classList.toggle('active', preset === 'female1');
+          if (btnF2) btnF2.classList.toggle('active', preset === 'female2');
+          if (btnF3) btnF3.classList.toggle('active', preset === 'female3');
+          if (btnM1) btnM1.classList.toggle('active', preset === 'male1');
+          if (btnM2) btnM2.classList.toggle('active', preset === 'male2');
+          _loadCustomModel(preset).then(scheduleRender).catch(() => scheduleRender());
+          scheduleRender();
+        },
+
+        updateTransform(layerKey, props) {
+          const layer = window.layers[layerKey];
+          if (!layer) return;
+          if ('x' in props) layer.x = props.x;
+          if ('y' in props) layer.y = props.y;
+          if ('scale' in props) layer.scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, props.scale));
+          if ('rotation' in props) layer.rotation = Math.min(20, Math.max(-20, props.rotation));
+          if ('opacity' in props) layer.opacity = Math.min(1, Math.max(0.2, props.opacity));
+          scheduleRender();
+        },
+
+        reset(layerKey) {
+          if (layerKey) {
+            const layer = window.layers[layerKey];
+            if (!layer) return;
+            const sa = SAFE_AREAS[/* re-derive type from id */Object.keys(SAFE_AREAS)[0]] || SAFE_AREAS.top;
+            Object.assign(layer, { x: sa.x - CW/2, y: sa.y - CH/2, scale: 1, rotation: 0, opacity: 1 });
+            _syncSlidersFromLayer(layerKey);
+          } else {
+            window.layers.top = null;
+            window.layers.bottom = null;
+          }
+          scheduleRender();
+        },
+
+        typeToLayerKey,
+        exportCanvas() { return _canvas; },
+      };
+    })();
+
+    /* ─── Constants ──────────────────────────────────────────── */
+    const MAX_FILE_SIZE = 20 * 1024 * 1024;
+    const MAX_THUMB_PX = 1024;
+    const MAX_RECORD_BYTES = 2 * 1024 * 1024;
+
+    const TYPE_LABELS = {
+      top: '上衣',
+      pants: '裤子',
+      skirt: '半身裙',
+      dress: '连衣裙',
+      shoes: '鞋子',
+    };
+
+    window.tempClothes = [];
+    window.selectedOutfit = { topId: null, bottomId: null };
+
+    /* ─── DOM refs ───────────────────────────────────────────── */
+    const dom = {
+      fileInput: document.getElementById('fileInput'),
+      dropzone: document.getElementById('dropzone'),
+      statusText: document.getElementById('statusText'),
+      wardrobeGrid: document.getElementById('wardrobeGrid'),
+      emptyState: document.getElementById('emptyState'),
+      filterTabs: document.getElementById('filterTabs'),
+      tryOnCanvas: document.getElementById('tryOnCanvas'),
+      toastStack: document.getElementById('toastStack'),
+      toolbarStatus: document.getElementById('toolbarStatus'),
+      clearPreviewButton: document.getElementById('clearPreviewButton'),
+      clearWardrobeButton: document.getElementById('clearWardrobeButton'),
+      exportButton: document.getElementById('exportButton'),
+      offsetX: document.getElementById('offsetX'),
+      offsetY: document.getElementById('offsetY'),
+      scale: document.getElementById('scale'),
+      rotation: document.getElementById('rotation'),
+      opacity: document.getElementById('opacity'),
+      offsetXValue: document.getElementById('offsetXValue'),
+      offsetYValue: document.getElementById('offsetYValue'),
+      scaleValue: document.getElementById('scaleValue'),
+      rotationValue: document.getElementById('rotationValue'),
+      opacityValue: document.getElementById('opacityValue'),
+      layerBtnTop: document.getElementById('layerBtnTop'),
+      layerBtnBottom: document.getElementById('layerBtnBottom'),
+      confirmEditButton: document.getElementById('confirmEditButton'),
+    };
+
+    /* ─── State ──────────────────────────────────────────────── */
+    const state = {
+      filter: 'all',
+      selectedClothId: null,
+      currentFile: null,
+      dbFailed: false,
+    };
+
+    /* ─── Debounce ───────────────────────────────────────────── */
+    function debounce(fn, ms) {
+      let t;
+      return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+    }
+
+    /* ─── Helpers ────────────────────────────────────────────── */
+    function getSelectedType() {
+      return document.querySelector('input[name="clothType"]:checked')?.value || 'top';
+    }
+
+    function showToast(title, message, tone = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${tone}`;
+      toast.innerHTML = `<strong>${title}</strong><p>${message}</p>`;
+      dom.toastStack.appendChild(toast);
+      window.setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        window.setTimeout(() => toast.remove(), 180);
+      }, 3000);
+    }
+
+    function formatTime(ts) {
+      const d = new Date(ts);
+      return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    }
+
+    function validateFile(file) {
+      if (!file) throw new Error('未选择文件');
+      const fileName = String(file.name || '').toLowerCase();
+      const fileType = String(file.type || '').toLowerCase();
+      const isImage = fileType.startsWith('image/') || /\.(png|jpg|jpeg|webp)$/i.test(fileName);
+      if (!isImage) throw new Error('当前版本仅支持图片上传');
+      if (file.size > MAX_FILE_SIZE) throw new Error('图片需小于 20MB');
+    }
+
+    function loadImageFromDataURL(dataURL) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('透明图加载失败'));
+        img.src = dataURL;
+      });
+    }
+
+    async function readAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result));
+        r.onerror = () => reject(new Error('文件读取失败'));
+        r.readAsDataURL(file);
+      });
+    }
+
+    async function compressDataURL(dataURL) {
+      const img = await loadImageFromDataURL(dataURL);
+      let w = img.naturalWidth, h = img.naturalHeight;
+      if (w <= MAX_THUMB_PX && dataURL.length < MAX_RECORD_BYTES) return dataURL;
+      if (w > MAX_THUMB_PX) { h = Math.round(h * MAX_THUMB_PX / w); w = MAX_THUMB_PX; }
+      const cvs = document.createElement('canvas');
+      cvs.width = w; cvs.height = h;
+      cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+      const compressed = cvs.toDataURL('image/png');
+      return compressed.length < dataURL.length ? compressed : dataURL;
+    }
+
+    function buildClothRecord({ type, dataURL }) {
+      return {
+        id: `cloth_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        type,
+        dataURL,
+        createdAt: Date.now(),
+      };
+    }
+
+    /* ─── DB save with quota fallback ────────────────────────── */
+    async function saveCloth(record) {
+      if (state.dbFailed) { window.tempClothes.unshift(record); return; }
+      try {
+        await window.WardrobeDB.add(record);
+        window.tempClothes = await window.WardrobeDB.getAll();
+      } catch (err) {
+        if (err && err.name === 'QuotaExceededError') {
+          await window.WardrobeDB.deleteOldest();
+          showToast('存储空间已满', '已自动清理最旧一条记录', 'warning');
+          try {
+            await window.WardrobeDB.add(record);
+            window.tempClothes = await window.WardrobeDB.getAll();
+          } catch (e2) {
+            state.dbFailed = true;
+            window.tempClothes.unshift(record);
+            showToast('存储降级', '已切换为内存模式，刷新后不保留', 'warning');
+          }
+        } else {
+          state.dbFailed = true;
+          window.tempClothes.unshift(record);
+          showToast('存储降级', '已切换为内存模式，刷新后不保留', 'warning');
+        }
+      }
+    }
+
+    /* ─── Outfit state ───────────────────────────────────────── */
+    function updateOutfitState(cloth) {
+      if (!cloth) return;
+      if (['top','dress'].includes(cloth.type)) window.selectedOutfit.topId = cloth.id;
+      else if (['pants','skirt'].includes(cloth.type)) window.selectedOutfit.bottomId = cloth.id;
+    }
+
+    function updateToolbarStatus(cloth) {
+      dom.toolbarStatus.textContent = cloth
+        ? `已选中：${TYPE_LABELS[cloth.type] || cloth.type} · ${formatTime(cloth.createdAt)}`
+        : '暂无选中衣物。';
+    }
+
+    /* ─── Select cloth → engine ──────────────────────────────── */
+    async function selectCloth(id) {
+      const cloth = window.tempClothes.find(item => item.id === id) || null;
+      state.selectedClothId = cloth?.id || null;
+      updateOutfitState(cloth);
+      updateToolbarStatus(cloth);
+      renderWardrobe();
+
+      if (cloth) {
+        const layerKey = window.TryonEngine.typeToLayerKey(cloth.type);
+        await window.TryonEngine.setLayer(layerKey, cloth);
+      }
+    }
+
+    /* ─── Wardrobe render ────────────────────────────────────── */
+    function renderWardrobe() {
+      const items = window.tempClothes.filter(i =>
+        state.filter === 'all' ? true : i.type === state.filter
+      );
+      dom.wardrobeGrid.innerHTML = '';
+      if (!items.length) { dom.wardrobeGrid.appendChild(dom.emptyState); return; }
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = `wardrobe-item${item.id === state.selectedClothId ? ' active' : ''}`;
+        card.style.position = 'relative';
+        card.innerHTML = `
+          <button type="button" class="wardrobe-delete" data-del="${item.id}" aria-label="删除">✕</button>
+          <div class="wardrobe-thumb">
+            <img src="${item.dataURL}" alt="${TYPE_LABELS[item.type] || item.type}" loading="lazy" />
+          </div>
+          <span class="tag">${TYPE_LABELS[item.type] || item.type}</span>
+          <div class="meta-line">${formatTime(item.createdAt)}</div>
+        `;
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('[data-del]')) return;
+          selectCloth(item.id);
+        });
+        card.querySelector('[data-del]').addEventListener('click', async (e) => {
+          e.stopPropagation();
+          await deleteCloth(item.id);
+        });
+        dom.wardrobeGrid.appendChild(card);
+      });
+    }
+
+    async function deleteCloth(id) {
+      if (!state.dbFailed) {
+        try { await window.WardrobeDB.delete(id); } catch (_) {}
+      }
+      window.tempClothes = window.tempClothes.filter(i => i.id !== id);
+
+      /* clear layer if this cloth was displayed */
+      for (const key of ['top','bottom']) {
+        if (window.layers[key]?.id === id) {
+          await window.TryonEngine.setLayer(key, null);
+        }
+      }
+
+      if (state.selectedClothId === id) {
+        state.selectedClothId = null;
+        updateToolbarStatus(null);
+      }
+      renderWardrobe();
+      renderFilterTabs();
+      showToast('已删除', '该衣物已从衣柜移除', 'warning');
+    }
+
+    function renderFilterTabs() {
+      dom.filterTabs.querySelectorAll('button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === state.filter);
+      });
+    }
+
+    function updateConfirmEditButton() {
+      if (!dom.confirmEditButton) return;
+      const isEditMode = window.TryonEngine.isEditMode();
+      dom.confirmEditButton.disabled = !isEditMode;
+      dom.confirmEditButton.textContent = isEditMode ? '确认' : '已确认';
+    }
+
+    /* ─── Sliders → engine ───────────────────────────────────── */
+    function bindSliderEvents() {
+      let sliderRafId = null;
+
+      function formatScaleValue(value) {
+        return Number.isInteger(value) ? String(value) : value.toFixed(1);
+      }
+
+      function applySliders() {
+        const key = window.TryonEngine.getActiveLayerKey();
+        const scaleValue = Number(dom.scale.value);
+        window.TryonEngine.updateTransform(key, {
+          x: Number(dom.offsetX.value),
+          y: Number(dom.offsetY.value),
+          scale: scaleValue / 100,
+          rotation: Number(dom.rotation.value),
+          opacity: Number(dom.opacity.value) / 100,
+        });
+        dom.offsetXValue.textContent = dom.offsetX.value;
+        dom.offsetYValue.textContent = dom.offsetY.value;
+        dom.scaleValue.textContent = `${formatScaleValue(scaleValue)}%`;
+        dom.rotationValue.textContent = `${dom.rotation.value}°`;
+        dom.opacityValue.textContent = `${dom.opacity.value}%`;
+      }
+
+      function scheduleSliderApply() {
+        if (sliderRafId) return;
+        sliderRafId = requestAnimationFrame(() => {
+          sliderRafId = null;
+          applySliders();
+        });
+      }
+
+      [dom.offsetX, dom.offsetY, dom.scale, dom.rotation, dom.opacity].forEach(el => {
+        el.addEventListener('input', scheduleSliderApply);
+      });
+    }
+
+    /* ─── Layer badge switch ─────────────────────────────────── */
+    function bindLayerBadgeEvents() {
+      document.getElementById('layerSwitchRow').addEventListener('click', (e) => {
+        const confirmButton = e.target.closest('#confirmEditButton');
+        if (confirmButton) {
+          window.TryonEngine.confirmAdjustments();
+          updateConfirmEditButton();
+          return;
+        }
+        const btn = e.target.closest('[data-layer]');
+        if (!btn) return;
+        window.TryonEngine.setActiveLayer(btn.dataset.layer);
+        updateConfirmEditButton();
+      });
+    }
+
+    /* ─── Upload / process ───────────────────────────────────── */
+    async function handleProcessedResult(dataURL) {
+      const compressed = await compressDataURL(dataURL);
+      const record = buildClothRecord({ type: getSelectedType(), dataURL: compressed });
+      await saveCloth(record);
+      state.currentFile = null;
+      console.log(`[Step4] PNG Ready | 后端: ${state.dbFailed ? 'Memory' : 'IndexedDB'} | Engine: TryonEngine`);
+      await selectCloth(record.id);
+      showToast('上传完成', `${TYPE_LABELS[record.type]} 已保存至本地衣柜`, 'success');
+      dom.statusText.textContent = `已上传 1 件${TYPE_LABELS[record.type]}，当前衣柜共 ${window.tempClothes.length} 件。`;
+      renderFilterTabs();
+      renderWardrobe();
+    }
+
+    async function processFile(file) {
+      try {
+        validateFile(file);
+        state.currentFile = file;
+        const dataURL = await readAsDataURL(file);
+        await handleProcessedResult(dataURL);
+      } catch (error) {
+        console.error(error);
+        dom.statusText.textContent = error.message || '上传失败';
+        showToast('上传失败', error.message || '请稍后重试', 'error');
+      }
+    }
+
+    function getFirstFileFromEvent(e) {
+      return e?.target?.files?.[0] || e?.dataTransfer?.files?.[0] || null;
+    }
+
+    function openFilePicker() {
+      if (typeof dom.fileInput.showPicker === 'function') {
+        dom.fileInput.showPicker();
+        return;
+      }
+      dom.fileInput.click();
+    }
+
+    /* ─── Event bindings ─────────────────────────────────────── */
+    function bindUploadEvents() {
+      dom.dropzone.addEventListener('click', () => {
+        openFilePicker();
+      });
+
+      dom.dropzone.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        openFilePicker();
+      });
+
+      dom.fileInput.addEventListener('change', async (e) => {
+        const f = getFirstFileFromEvent(e);
+        if (!f) return;
+        dom.statusText.textContent = `正在读取：${f.name}`;
+        await processFile(f);
+        dom.fileInput.value = '';
+      });
+
+      ['dragenter','dragover'].forEach(n => dom.dropzone.addEventListener(n, (e) => {
+        e.preventDefault();
+        dom.dropzone.classList.add('is-dragover');
+      }));
+      ['dragleave','drop'].forEach(n => dom.dropzone.addEventListener(n, (e) => {
+        e.preventDefault();
+        dom.dropzone.classList.remove('is-dragover');
+      }));
+      dom.dropzone.addEventListener('drop', async (e) => {
+        const f = getFirstFileFromEvent(e);
+        if (!f) return;
+        dom.statusText.textContent = `正在读取：${f.name}`;
+        await processFile(f);
+      });
+    }
+
+    function bindFilterEvents() {
+      dom.filterTabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-filter]');
+        if (!btn) return;
+        state.filter = btn.dataset.filter;
+        renderFilterTabs();
+        renderWardrobe();
+      });
+    }
+
+    function bindToolbarEvents() {
+      dom.clearPreviewButton.addEventListener('click', () => {
+        state.selectedClothId = null;
+        window.TryonEngine.reset();
+        updateToolbarStatus(null);
+        renderWardrobe();
+      });
+
+      dom.clearWardrobeButton.addEventListener('click', async () => {
+        if (!state.dbFailed) {
+          try {
+            const all = await window.WardrobeDB.getAll();
+            await Promise.all(all.map(i => window.WardrobeDB.delete(i.id)));
+          } catch (_) {}
+        }
+        window.tempClothes = [];
+        state.selectedClothId = null;
+        state.currentFile = null;
+        window.TryonEngine.reset();
+        updateToolbarStatus(null);
+        dom.statusText.textContent = '当前为透明 PNG 上传 + 本地衣柜持久化模式，刷新后仍会保留。';
+        renderWardrobe();
+        showToast('已清空', '本地衣柜已全部清除', 'warning');
+      });
+
+      dom.exportButton.addEventListener('click', () => {
+        const canvas = window.TryonEngine.exportCanvas();
+        canvas.toBlob((blob) => {
+          if (!blob) { showToast('导出失败', '当前画布为空或浏览器不支持导出', 'error'); return; }
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `try-on-${Date.now()}.png`;
+          a.click();
+          URL.revokeObjectURL(url);
+          showToast('导出成功', '搭配图已开始下载', 'success');
+        }, 'image/png');
+      });
+    }
+
+    /* ─── Init ───────────────────────────────────────────────── */
+    async function init() {
+      /* init engine first */
+      window.TryonEngine.init(dom.tryOnCanvas);
+
+      try {
+        await window.WardrobeDB.init();
+        window.tempClothes = await window.WardrobeDB.getAll();
+      } catch (err) {
+        state.dbFailed = true;
+        showToast('IndexedDB 不可用', '已降级为内存模式，刷新后不保留', 'warning');
+      }
+
+      bindSliderEvents();
+      bindLayerBadgeEvents();
+      bindUploadEvents();
+      bindFilterEvents();
+      bindToolbarEvents();
+
+      /* mannequin switch */
+      document.getElementById('modelFemale1').addEventListener('click', () => window.TryonEngine.setModelPreset('female1'));
+      document.getElementById('modelFemale2').addEventListener('click', () => window.TryonEngine.setModelPreset('female2'));
+      document.getElementById('modelFemale3').addEventListener('click', () => window.TryonEngine.setModelPreset('female3'));
+      document.getElementById('modelMale1').addEventListener('click', () => window.TryonEngine.setModelPreset('male1'));
+      document.getElementById('modelMale2').addEventListener('click', () => window.TryonEngine.setModelPreset('male2'));
+      renderFilterTabs();
+      renderWardrobe();
+      updateConfirmEditButton();
+      window.TryonEngine.render();
+    }
+
+    init();
+  </script>
+</body>
+</html>
