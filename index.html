@@ -8,6 +8,7 @@
   />
   <title>穿搭试衣间</title>
   <style>
+    /* ===== CSS ===== */
     :root {
       --bg: #f5f7fb;
       --panel: rgba(255, 255, 255, 0.9);
@@ -654,6 +655,7 @@
   </style>
 </head>
 <body>
+  <!-- ===== HTML ===== -->
   <div class="app-shell">
     <header class="topbar">
       <div>
@@ -811,6 +813,7 @@
   <div class="toast-stack" id="toastStack"></div>
 
   <script>
+    /* ===== JS 数据层 ===== */
     /* ─── WardrobeDB ─────────────────────────────────────────── */
     window.WardrobeDB = (() => {
       const DB_NAME = 'WardrobeDB';
@@ -863,12 +866,13 @@
       };
     })();
 
+    /* ===== JS 图表层 ===== */
     /* ─── TryonEngine ────────────────────────────────────────── */
     window.TryonEngine = (() => {
       /* logical canvas size — CSS scales it to fit container */
       const CW = 540, CH = 960;
       let _canvas = null, _ctx = null;
-      let _rafId = null, _dirty = false;
+      let _dirty = false;
       let _dpr = 1;
 
       /* image cache: id → HTMLImageElement */
@@ -919,7 +923,7 @@
       function scheduleRender() {
         if (_dirty) return;
         _dirty = true;
-        _rafId = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
           _dirty = false;
           _render();
         });
@@ -950,10 +954,6 @@
       /* current mannequin preset */
       let _modelPreset = 'female1';
 
-      function _getModelGenderByPreset(preset = _modelPreset) {
-        return preset === 'male1' || preset === 'male2' ? 'male' : 'female';
-      }
-
       function _loadCustomModel(preset = _modelPreset) {
         if (_customModelImg[preset]) return Promise.resolve(_customModelImg[preset]);
         if (_customModelLoading[preset]) return _customModelLoading[preset];
@@ -971,12 +971,6 @@
         });
         return _customModelLoading[preset];
       }
-
-      /* ── mannequin SVG paths (logical 540×960 canvas) ────────
-         All paths drawn in a coordinate system centered at (270, 480).
-         Female: slender hourglass fashion figure
-         Male:   broad-shoulder athletic figure
-      ──────────────────────────────────────────────────────── */
 
       const DEFAULT_MODEL_FOREGROUND_RATIO = 0.24;
       const MODEL_SCALE_BY_PRESET = {
@@ -1040,415 +1034,6 @@
         if (_customModelImg[_modelPreset]) {
           _drawCustomModelForeground(ctx, _customModelImg[_modelPreset]);
         }
-      }
-
-      /* ── skin / stroke palette ───────────────────────────────── */
-      const SKIN   = '#f5cba7';
-      const SKIN2  = '#e8b48a';   /* shadow / limbs */
-      const STROKE = 'rgba(160,120,80,0.35)';
-      const HAIR_F = '#3b2314';
-      const HAIR_M = '#2c1a0e';
-      const SUIT   = 'rgba(200,210,230,0.18)';   /* clothes guide tint */
-      const REF    = 'rgba(99,102,241,0.15)';     /* reference lines */
-
-      function _applyFill(ctx, color, strokeColor) {
-        ctx.fillStyle = color;
-        ctx.fill();
-        if (strokeColor) {
-          ctx.strokeStyle = strokeColor;
-          ctx.lineWidth = 1.2;
-          ctx.stroke();
-        }
-      }
-
-      /* ════════════════════════════════════════════════
-         FEMALE FIGURE  (centered, ~540×960 logical)
-         Height span: head top ≈ -450, feet bottom ≈ +450
-      ════════════════════════════════════════════════ */
-      function _drawFemale(ctx) {
-
-        /* ── shadow ellipse ── */
-        ctx.save();
-        ctx.fillStyle = 'rgba(0,0,0,0.06)';
-        ctx.beginPath();
-        ctx.ellipse(0, 445, 85, 14, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-
-        /* ── legs (drawn first, behind torso) ── */
-        ctx.save();
-        /* left leg */
-        ctx.beginPath();
-        ctx.moveTo(-18, 160);
-        ctx.bezierCurveTo(-18, 200, -30, 280, -34, 360);
-        ctx.bezierCurveTo(-36, 400, -32, 420, -28, 445);
-        ctx.lineTo(-10, 445);
-        ctx.bezierCurveTo(-12, 420, -14, 400, -12, 360);
-        ctx.bezierCurveTo(-8, 280,  -2, 200,  0, 160);
-        ctx.closePath();
-        _applyFill(ctx, SKIN2, STROKE);
-
-        /* right leg */
-        ctx.beginPath();
-        ctx.moveTo(18, 160);
-        ctx.bezierCurveTo(18, 200, 30, 280, 34, 360);
-        ctx.bezierCurveTo(36, 400, 32, 420, 28, 445);
-        ctx.lineTo(10, 445);
-        ctx.bezierCurveTo(12, 420, 14, 400, 12, 360);
-        ctx.bezierCurveTo(8, 280, 2, 200, 0, 160);
-        ctx.closePath();
-        _applyFill(ctx, SKIN2, STROKE);
-        ctx.restore();
-
-        /* ── arms ── */
-        ctx.save();
-        /* left arm */
-        ctx.beginPath();
-        ctx.moveTo(-62, -140);
-        ctx.bezierCurveTo(-80, -100, -90, 0, -86, 80);
-        ctx.bezierCurveTo(-84, 110, -78, 130, -74, 150);
-        ctx.lineTo(-60, 148);
-        ctx.bezierCurveTo(-64, 128, -68, 108, -70, 80);
-        ctx.bezierCurveTo(-74, 0, -64, -96, -46, -136);
-        ctx.closePath();
-        _applyFill(ctx, SKIN, STROKE);
-
-        /* right arm */
-        ctx.beginPath();
-        ctx.moveTo(62, -140);
-        ctx.bezierCurveTo(80, -100, 90, 0, 86, 80);
-        ctx.bezierCurveTo(84, 110, 78, 130, 74, 150);
-        ctx.lineTo(60, 148);
-        ctx.bezierCurveTo(64, 128, 68, 108, 70, 80);
-        ctx.bezierCurveTo(74, 0, 64, -96, 46, -136);
-        ctx.closePath();
-        _applyFill(ctx, SKIN, STROKE);
-        ctx.restore();
-
-        /* ── torso (hourglass) ── */
-        ctx.save();
-        ctx.beginPath();
-        /* top: shoulders */
-        ctx.moveTo(-70, -150);
-        ctx.bezierCurveTo(-72, -130, -68, -90, -58, -60);
-        /* waist in */
-        ctx.bezierCurveTo(-48, -28, -38, -10, -36, 10);
-        /* hips out */
-        ctx.bezierCurveTo(-34, 30, -44, 80, -48, 120);
-        ctx.bezierCurveTo(-50, 140, -42, 158, -22, 162);
-        ctx.lineTo(22, 162);
-        ctx.bezierCurveTo(42, 158, 50, 140, 48, 120);
-        ctx.bezierCurveTo(44, 80, 34, 30, 36, 10);
-        ctx.bezierCurveTo(38, -10, 48, -28, 58, -60);
-        ctx.bezierCurveTo(68, -90, 72, -130, 70, -150);
-        /* shoulder curve */
-        ctx.bezierCurveTo(58, -162, 30, -168, 0, -168);
-        ctx.bezierCurveTo(-30, -168, -58, -162, -70, -150);
-        ctx.closePath();
-        _applyFill(ctx, SKIN, STROKE);
-        ctx.restore();
-
-        /* ── chest detail (subtle) ── */
-        ctx.save();
-        ctx.fillStyle = 'rgba(160,100,60,0.08)';
-        ctx.beginPath();
-        ctx.ellipse(-18, -90, 20, 14, -0.2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.ellipse(18, -90, 20, 14, 0.2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-
-        /* ── neck ── */
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(-16, -168);
-        ctx.bezierCurveTo(-18, -190, -16, -210, -14, -224);
-        ctx.lineTo(14, -224);
-        ctx.bezierCurveTo(16, -210, 18, -190, 16, -168);
-        ctx.closePath();
-        _applyFill(ctx, SKIN, STROKE);
-        ctx.restore();
-
-        /* ── head ── */
-        ctx.save();
-        ctx.beginPath();
-        ctx.ellipse(0, -268, 42, 52, 0, 0, Math.PI * 2);
-        _applyFill(ctx, SKIN, STROKE);
-        ctx.restore();
-
-        /* ── hair (long) ── */
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(-42, -290);
-        ctx.bezierCurveTo(-55, -270, -58, -240, -56, -210);
-        ctx.bezierCurveTo(-54, -180, -50, -160, -48, -150);
-        ctx.bezierCurveTo(-52, -168, -48, -200, -42, -230);
-        ctx.bezierCurveTo(-36, -260, -20, -320, 0, -320);
-        ctx.bezierCurveTo(20, -320, 36, -260, 42, -230);
-        ctx.bezierCurveTo(48, -200, 52, -168, 48, -150);
-        ctx.bezierCurveTo(50, -160, 54, -180, 56, -210);
-        ctx.bezierCurveTo(58, -240, 55, -270, 42, -290);
-        ctx.bezierCurveTo(30, -328, -30, -328, -42, -290);
-        ctx.closePath();
-        _applyFill(ctx, HAIR_F, null);
-        ctx.restore();
-
-        /* ── facial features (minimal dot eyes + mouth) ── */
-        ctx.save();
-        ctx.fillStyle = 'rgba(60,30,10,0.7)';
-        ctx.beginPath(); ctx.ellipse(-14, -270, 3, 3.5, 0, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(14, -270, 3, 3.5, 0, 0, Math.PI*2); ctx.fill();
-        ctx.strokeStyle = 'rgba(160,80,60,0.55)';
-        ctx.lineWidth = 1.8;
-        ctx.beginPath();
-        ctx.arc(0, -256, 10, 0.1, Math.PI - 0.1);
-        ctx.stroke();
-        ctx.restore();
-
-        /* ── hands ── */
-        ctx.save();
-        ctx.fillStyle = SKIN;
-        ctx.strokeStyle = STROKE;
-        ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.ellipse(-67, 153, 10, 13, 0.1, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-        ctx.beginPath(); ctx.ellipse(67, 153, 10, 13, -0.1, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-        ctx.restore();
-
-        /* ── feet / heels ── */
-        ctx.save();
-        ctx.fillStyle = SKIN2;
-        ctx.strokeStyle = STROKE;
-        ctx.lineWidth = 1;
-        /* left foot */
-        ctx.beginPath();
-        ctx.moveTo(-28, 438);
-        ctx.bezierCurveTo(-32, 438, -38, 442, -38, 448);
-        ctx.lineTo(-8, 448);
-        ctx.lineTo(-8, 438);
-        ctx.closePath();
-        ctx.fill(); ctx.stroke();
-        /* right foot */
-        ctx.beginPath();
-        ctx.moveTo(28, 438);
-        ctx.bezierCurveTo(32, 438, 38, 442, 38, 448);
-        ctx.lineTo(8, 448);
-        ctx.lineTo(8, 438);
-        ctx.closePath();
-        ctx.fill(); ctx.stroke();
-        ctx.restore();
-
-        /* ── reference guide lines ── */
-        ctx.save();
-        ctx.strokeStyle = REF;
-        ctx.lineWidth = 1;
-        ctx.setLineDash([6, 6]);
-        /* shoulder */
-        ctx.beginPath(); ctx.moveTo(-75, -150); ctx.lineTo(75, -150); ctx.stroke();
-        /* bust */
-        ctx.beginPath(); ctx.moveTo(-62, -90); ctx.lineTo(62, -90); ctx.stroke();
-        /* waist */
-        ctx.beginPath(); ctx.moveTo(-40, 10); ctx.lineTo(40, 10); ctx.stroke();
-        /* hip */
-        ctx.beginPath(); ctx.moveTo(-52, 110); ctx.lineTo(52, 110); ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.restore();
-      }
-
-      /* ════════════════════════════════════════════════
-         MALE FIGURE
-         Broad shoulders, flat chest, narrower hips
-      ════════════════════════════════════════════════ */
-      function _drawMale(ctx) {
-
-        /* ── shadow ── */
-        ctx.save();
-        ctx.fillStyle = 'rgba(0,0,0,0.07)';
-        ctx.beginPath();
-        ctx.ellipse(0, 445, 95, 14, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-
-        /* ── legs ── */
-        ctx.save();
-        /* left leg */
-        ctx.beginPath();
-        ctx.moveTo(-26, 140);
-        ctx.bezierCurveTo(-28, 200, -36, 290, -38, 370);
-        ctx.bezierCurveTo(-39, 405, -36, 425, -32, 445);
-        ctx.lineTo(-12, 445);
-        ctx.bezierCurveTo(-14, 425, -16, 405, -16, 370);
-        ctx.bezierCurveTo(-14, 290, -6, 200, -2, 140);
-        ctx.closePath();
-        _applyFill(ctx, SKIN2, STROKE);
-
-        /* right leg */
-        ctx.beginPath();
-        ctx.moveTo(26, 140);
-        ctx.bezierCurveTo(28, 200, 36, 290, 38, 370);
-        ctx.bezierCurveTo(39, 405, 36, 425, 32, 445);
-        ctx.lineTo(12, 445);
-        ctx.bezierCurveTo(14, 425, 16, 405, 16, 370);
-        ctx.bezierCurveTo(14, 290, 6, 200, 2, 140);
-        ctx.closePath();
-        _applyFill(ctx, SKIN2, STROKE);
-        ctx.restore();
-
-        /* ── arms ── */
-        ctx.save();
-        /* left arm */
-        ctx.beginPath();
-        ctx.moveTo(-86, -130);
-        ctx.bezierCurveTo(-104, -80, -110, 20, -104, 110);
-        ctx.bezierCurveTo(-102, 130, -96, 148, -90, 162);
-        ctx.lineTo(-74, 158);
-        ctx.bezierCurveTo(-80, 144, -84, 126, -86, 108);
-        ctx.bezierCurveTo(-90, 18, -84, -76, -66, -124);
-        ctx.closePath();
-        _applyFill(ctx, SKIN, STROKE);
-
-        /* right arm */
-        ctx.beginPath();
-        ctx.moveTo(86, -130);
-        ctx.bezierCurveTo(104, -80, 110, 20, 104, 110);
-        ctx.bezierCurveTo(102, 130, 96, 148, 90, 162);
-        ctx.lineTo(74, 158);
-        ctx.bezierCurveTo(80, 144, 84, 126, 86, 108);
-        ctx.bezierCurveTo(90, 18, 84, -76, 66, -124);
-        ctx.closePath();
-        _applyFill(ctx, SKIN, STROKE);
-        ctx.restore();
-
-        /* ── torso (inverted triangle, flat chest) ── */
-        ctx.save();
-        ctx.beginPath();
-        /* shoulders wide */
-        ctx.moveTo(-90, -148);
-        ctx.bezierCurveTo(-90, -120, -82, -80, -68, -40);
-        /* taper to waist */
-        ctx.bezierCurveTo(-54, 0, -46, 40, -46, 80);
-        /* hips (narrower than female) */
-        ctx.bezierCurveTo(-46, 110, -42, 135, -30, 144);
-        ctx.lineTo(30, 144);
-        ctx.bezierCurveTo(42, 135, 46, 110, 46, 80);
-        ctx.bezierCurveTo(46, 40, 54, 0, 68, -40);
-        ctx.bezierCurveTo(82, -80, 90, -120, 90, -148);
-        /* shoulder top */
-        ctx.bezierCurveTo(76, -164, 40, -172, 0, -172);
-        ctx.bezierCurveTo(-40, -172, -76, -164, -90, -148);
-        ctx.closePath();
-        _applyFill(ctx, SKIN, STROKE);
-        ctx.restore();
-
-        /* ── pectoral detail ── */
-        ctx.save();
-        ctx.strokeStyle = 'rgba(140,90,50,0.15)';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.arc(-22, -80, 22, 0.3, Math.PI - 0.3);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(22, -80, 22, 0.3, Math.PI - 0.3);
-        ctx.stroke();
-        ctx.restore();
-
-        /* ── abs hint ── */
-        ctx.save();
-        ctx.strokeStyle = 'rgba(140,90,50,0.1)';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < 3; i++) {
-          ctx.beginPath();
-          ctx.moveTo(-24, -20 + i*28); ctx.lineTo(24, -20 + i*28);
-          ctx.stroke();
-        }
-        ctx.restore();
-
-        /* ── neck ── */
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(-18, -172);
-        ctx.bezierCurveTo(-20, -192, -18, -212, -16, -226);
-        ctx.lineTo(16, -226);
-        ctx.bezierCurveTo(18, -212, 20, -192, 18, -172);
-        ctx.closePath();
-        _applyFill(ctx, SKIN, STROKE);
-        ctx.restore();
-
-        /* ── head ── */
-        ctx.save();
-        ctx.beginPath();
-        ctx.ellipse(0, -272, 44, 50, 0, 0, Math.PI * 2);
-        _applyFill(ctx, SKIN, STROKE);
-        ctx.restore();
-
-        /* ── hair (short) ── */
-        ctx.save();
-        ctx.beginPath();
-        ctx.ellipse(0, -298, 44, 28, 0, 0, Math.PI * 2);
-        ctx.fillStyle = HAIR_M;
-        ctx.fill();
-        /* hairline edge */
-        ctx.beginPath();
-        ctx.moveTo(-44, -282);
-        ctx.bezierCurveTo(-38, -316, -20, -328, 0, -328);
-        ctx.bezierCurveTo(20, -328, 38, -316, 44, -282);
-        ctx.fillStyle = HAIR_M;
-        ctx.fill();
-        ctx.restore();
-
-        /* ── facial features ── */
-        ctx.save();
-        ctx.fillStyle = 'rgba(50,25,5,0.75)';
-        ctx.beginPath(); ctx.ellipse(-15, -274, 3.5, 3.5, 0, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(15, -274, 3.5, 3.5, 0, 0, Math.PI*2); ctx.fill();
-        /* brow */
-        ctx.strokeStyle = HAIR_M;
-        ctx.lineWidth = 2.5;
-        ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(-22, -286); ctx.lineTo(-8, -282); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(22, -286); ctx.lineTo(8, -282); ctx.stroke();
-        /* mouth */
-        ctx.strokeStyle = 'rgba(150,70,50,0.5)';
-        ctx.lineWidth = 1.8;
-        ctx.beginPath();
-        ctx.moveTo(-10, -256); ctx.lineTo(10, -256);
-        ctx.stroke();
-        ctx.restore();
-
-        /* ── hands ── */
-        ctx.save();
-        ctx.fillStyle = SKIN;
-        ctx.strokeStyle = STROKE;
-        ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.ellipse(-82, 165, 12, 14, 0.1, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-        ctx.beginPath(); ctx.ellipse(82, 165, 12, 14, -0.1, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-        ctx.restore();
-
-        /* ── feet ── */
-        ctx.save();
-        ctx.fillStyle = SKIN2;
-        ctx.strokeStyle = STROKE;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(-32, 438); ctx.bezierCurveTo(-36, 438, -44, 442, -44, 448);
-        ctx.lineTo(-10, 448); ctx.lineTo(-10, 438); ctx.closePath();
-        ctx.fill(); ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(32, 438); ctx.bezierCurveTo(36, 438, 44, 442, 44, 448);
-        ctx.lineTo(10, 448); ctx.lineTo(10, 438); ctx.closePath();
-        ctx.fill(); ctx.stroke();
-        ctx.restore();
-
-        /* ── reference guide lines ── */
-        ctx.save();
-        ctx.strokeStyle = REF;
-        ctx.lineWidth = 1;
-        ctx.setLineDash([6, 6]);
-        ctx.beginPath(); ctx.moveTo(-95, -148); ctx.lineTo(95, -148); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(-72, -40); ctx.lineTo(72, -40); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(-50, 70); ctx.lineTo(50, 70); ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.restore();
       }
 
       /* ── draw one cloth layer ────────────────────────────────── */
@@ -1768,6 +1353,7 @@
       };
     })();
 
+    /* ===== JS UI层 ===== */
     /* ─── Constants ──────────────────────────────────────────── */
     const MAX_FILE_SIZE = 20 * 1024 * 1024;
     const MAX_THUMB_PX = 1024;
@@ -1782,7 +1368,6 @@
     };
 
     window.tempClothes = [];
-    window.selectedOutfit = { topId: null, bottomId: null };
 
     /* ─── DOM refs ───────────────────────────────────────────── */
     const dom = {
@@ -1817,15 +1402,8 @@
     const state = {
       filter: 'all',
       selectedClothId: null,
-      currentFile: null,
       dbFailed: false,
     };
-
-    /* ─── Debounce ───────────────────────────────────────────── */
-    function debounce(fn, ms) {
-      let t;
-      return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
-    }
 
     /* ─── Helpers ────────────────────────────────────────────── */
     function getSelectedType() {
@@ -1923,13 +1501,6 @@
       }
     }
 
-    /* ─── Outfit state ───────────────────────────────────────── */
-    function updateOutfitState(cloth) {
-      if (!cloth) return;
-      if (['top','dress'].includes(cloth.type)) window.selectedOutfit.topId = cloth.id;
-      else if (['pants','skirt'].includes(cloth.type)) window.selectedOutfit.bottomId = cloth.id;
-    }
-
     function updateToolbarStatus(cloth) {
       dom.toolbarStatus.textContent = cloth
         ? `已选中：${TYPE_LABELS[cloth.type] || cloth.type} · ${formatTime(cloth.createdAt)}`
@@ -1940,7 +1511,6 @@
     async function selectCloth(id) {
       const cloth = window.tempClothes.find(item => item.id === id) || null;
       state.selectedClothId = cloth?.id || null;
-      updateOutfitState(cloth);
       updateToolbarStatus(cloth);
       renderWardrobe();
 
@@ -2076,7 +1646,6 @@
       const compressed = await compressDataURL(dataURL);
       const record = buildClothRecord({ type: getSelectedType(), dataURL: compressed });
       await saveCloth(record);
-      state.currentFile = null;
       console.log(`[Step4] PNG Ready | 后端: ${state.dbFailed ? 'Memory' : 'IndexedDB'} | Engine: TryonEngine`);
       await selectCloth(record.id);
       showToast('上传完成', `${TYPE_LABELS[record.type]} 已保存至本地衣柜`, 'success');
@@ -2088,7 +1657,6 @@
     async function processFile(file) {
       try {
         validateFile(file);
-        state.currentFile = file;
         const dataURL = await readAsDataURL(file);
         await handleProcessedResult(dataURL);
       } catch (error) {
@@ -2173,7 +1741,6 @@
         }
         window.tempClothes = [];
         state.selectedClothId = null;
-        state.currentFile = null;
         window.TryonEngine.reset();
         updateToolbarStatus(null);
         dom.statusText.textContent = '当前为透明 PNG 上传 + 本地衣柜持久化模式，刷新后仍会保留。';
@@ -2229,5 +1796,7 @@
 
     init();
   </script>
+  <!-- Version: v1.0.0 -->
+  <!-- Last Updated: 2026-06-10 -->
 </body>
 </html>
