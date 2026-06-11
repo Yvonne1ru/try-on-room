@@ -323,6 +323,74 @@
       box-shadow: none;
     }
 
+    .split-btn {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .split-btn .btn-main {
+      border-radius: 14px 0 0 14px;
+      border-right: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .split-btn .btn-arrow {
+      border-radius: 0 14px 14px 0;
+      padding: 0 10px;
+      min-height: 44px;
+      background: rgba(15, 23, 42, 0.06);
+      border: 0;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--subtext);
+      transition: 0.18s ease;
+    }
+
+    .split-btn .btn-arrow:hover {
+      background: rgba(15, 23, 42, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .split-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 140px;
+      background: white;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 14px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+      overflow: hidden;
+      z-index: 20;
+      display: none;
+    }
+
+    .split-dropdown.open {
+      display: block;
+    }
+
+    .split-dropdown button {
+      display: block;
+      width: 100%;
+      padding: 11px 16px;
+      text-align: left;
+      border: 0;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .split-dropdown button:hover {
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .split-dropdown button + button {
+      border-top: 1px solid rgba(15, 23, 42, 0.06);
+    }
+
     .preview-panel .panel-body {
       align-items: center;
       justify-content: center;
@@ -730,6 +798,7 @@
               <span style="font-size:12px;color:var(--subtext);font-weight:600;">编辑图层：</span>
               <button type="button" class="layer-badge active" data-layer="top" id="layerBtnTop">上衣 / 连衣裙</button>
               <button type="button" class="layer-badge" data-layer="bottom" id="layerBtnBottom">下装 / 鞋子</button>
+              <button type="button" class="btn btn-ghost" id="layerOrderButton" style="min-height:32px;padding:0 12px;font-size:12px;" title="切换图层叠放顺序">上衣在前</button>
               <button type="button" class="btn btn-ghost" id="confirmEditButton" style="min-height:32px;padding:0 12px;font-size:12px;">确认</button>
             </div>
             <div class="slider-grid">
@@ -797,7 +866,15 @@
       <div class="toolbar-group">
         <h3>工具栏</h3>
         <div class="toolbar-actions">
-          <button class="btn btn-secondary" id="clearPreviewButton" type="button">清空预览</button>
+          <div class="split-btn" id="clearPreviewSplit">
+            <button class="btn btn-secondary btn-main" id="clearPreviewButton" type="button">清空预览</button>
+            <button class="btn-arrow" id="clearPreviewArrow" type="button" aria-label="展开清空选项">▾</button>
+            <div class="split-dropdown" id="clearPreviewDropdown">
+              <button type="button" data-clear="top">清空上衣</button>
+              <button type="button" data-clear="bottom">清空下装</button>
+              <button type="button" data-clear="all">全部清空</button>
+            </div>
+          </div>
           <button class="btn btn-ghost" id="clearWardrobeButton" type="button">清空暂存衣柜</button>
           <button class="btn btn-primary" id="exportButton" type="button">导出搭配图</button>
         </div>
@@ -886,6 +963,9 @@
 
       /* which layer is active for slider / drag interactions */
       let _activeLayerKey = 'top';
+
+      /* layer z-order: 'top-over' = top drawn last (on top), 'bottom-over' = bottom drawn last */
+      let _layerOrder = 'top-over';
 
       /* drag state */
       const _drag = { active: false, layerKey: null, startX: 0, startY: 0, origX: 0, origY: 0 };
@@ -1097,8 +1177,13 @@
         ctx.clearRect(0, 0, CW, CH);
         _drawBackground(ctx);
         _drawMannequin(ctx);
-        _drawLayer(ctx, 'bottom', window.layers.bottom);
-        _drawLayer(ctx, 'top', window.layers.top);
+        if (_layerOrder === 'top-over') {
+          _drawLayer(ctx, 'bottom', window.layers.bottom);
+          _drawLayer(ctx, 'top', window.layers.top);
+        } else {
+          _drawLayer(ctx, 'top', window.layers.top);
+          _drawLayer(ctx, 'bottom', window.layers.bottom);
+        }
         _drawMannequinForeground(ctx);
       }
 
@@ -1350,6 +1435,12 @@
 
         typeToLayerKey,
         exportCanvas() { return _canvas; },
+        getLayerOrder() { return _layerOrder; },
+        setLayerOrder(order) {
+          if (order !== 'top-over' && order !== 'bottom-over') return;
+          _layerOrder = order;
+          scheduleRender();
+        },
       };
     })();
 
@@ -1381,6 +1472,8 @@
       toastStack: document.getElementById('toastStack'),
       toolbarStatus: document.getElementById('toolbarStatus'),
       clearPreviewButton: document.getElementById('clearPreviewButton'),
+      clearPreviewArrow: document.getElementById('clearPreviewArrow'),
+      clearPreviewDropdown: document.getElementById('clearPreviewDropdown'),
       clearWardrobeButton: document.getElementById('clearWardrobeButton'),
       exportButton: document.getElementById('exportButton'),
       offsetX: document.getElementById('offsetX'),
@@ -1395,6 +1488,7 @@
       opacityValue: document.getElementById('opacityValue'),
       layerBtnTop: document.getElementById('layerBtnTop'),
       layerBtnBottom: document.getElementById('layerBtnBottom'),
+      layerOrderButton: document.getElementById('layerOrderButton'),
       confirmEditButton: document.getElementById('confirmEditButton'),
     };
 
@@ -1625,6 +1719,12 @@
       });
     }
 
+    function updateLayerOrderButton() {
+      if (!dom.layerOrderButton) return;
+      const order = window.TryonEngine.getLayerOrder();
+      dom.layerOrderButton.textContent = order === 'top-over' ? '上衣在前' : '下装在前';
+    }
+
     /* ─── Layer badge switch ─────────────────────────────────── */
     function bindLayerBadgeEvents() {
       document.getElementById('layerSwitchRow').addEventListener('click', (e) => {
@@ -1632,6 +1732,13 @@
         if (confirmButton) {
           window.TryonEngine.confirmAdjustments();
           updateConfirmEditButton();
+          return;
+        }
+        const orderButton = e.target.closest('#layerOrderButton');
+        if (orderButton) {
+          const current = window.TryonEngine.getLayerOrder();
+          window.TryonEngine.setLayerOrder(current === 'top-over' ? 'bottom-over' : 'top-over');
+          updateLayerOrderButton();
           return;
         }
         const btn = e.target.closest('[data-layer]');
@@ -1725,11 +1832,44 @@
     }
 
     function bindToolbarEvents() {
-      dom.clearPreviewButton.addEventListener('click', () => {
-        state.selectedClothId = null;
-        window.TryonEngine.reset();
-        updateToolbarStatus(null);
-        renderWardrobe();
+      /* clear preview: main button = all clear, arrow toggles dropdown */
+      function clearLayer(layerKey) {
+        if (layerKey === 'all') {
+          window.TryonEngine.reset();
+          state.selectedClothId = null;
+          updateToolbarStatus(null);
+          renderWardrobe();
+        } else {
+          window.TryonEngine.setLayer(layerKey, null);
+          /* deselect if selected cloth was in that layer */
+          const selected = window.tempClothes.find(i => i.id === state.selectedClothId);
+          if (selected && window.TryonEngine.typeToLayerKey(selected.type) === layerKey) {
+            state.selectedClothId = null;
+            updateToolbarStatus(null);
+            renderWardrobe();
+          }
+        }
+      }
+
+      dom.clearPreviewButton.addEventListener('click', () => clearLayer('all'));
+
+      dom.clearPreviewArrow.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dom.clearPreviewDropdown.classList.toggle('open');
+      });
+
+      dom.clearPreviewDropdown.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-clear]');
+        if (!btn) return;
+        clearLayer(btn.dataset.clear);
+        dom.clearPreviewDropdown.classList.remove('open');
+      });
+
+      /* close dropdown when clicking outside */
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#clearPreviewSplit')) {
+          dom.clearPreviewDropdown.classList.remove('open');
+        }
       });
 
       dom.clearWardrobeButton.addEventListener('click', async () => {
@@ -1791,6 +1931,7 @@
       renderFilterTabs();
       renderWardrobe();
       updateConfirmEditButton();
+      updateLayerOrderButton();
       window.TryonEngine.render();
     }
 
